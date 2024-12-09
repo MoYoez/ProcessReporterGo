@@ -4,6 +4,17 @@ A Go implementation of [ProcessReporter](https://github.com/mx-space/ProcessRepo
 
 ProcessReporter 是一个 为 [Shiro](https://github.com/Innei/Shiro) 主题做的一个简单的上报工具，然后将其可以在用户的主题上显示。
 
+## Installation
+
+See Release
+
+## Build
+
+```Shell
+go build -ldflags "-s -w"
+```
+
+
 ## Requirement
 
 - A computer which can play minesweeper and not too old (.
