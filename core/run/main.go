@@ -4,8 +4,8 @@ import (
 	"github.com/MoYoez/ProcessReporterGo/core/caller"
 	"github.com/MoYoez/ProcessReporterGo/core/define"
 	"github.com/MoYoez/ProcessReporterGo/types"
+	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"log"
 	"os"
 	"strconv"
 )
@@ -16,6 +16,7 @@ func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
+		return
 	}
 	// check config sets.
 	DefaultConfigSets = types.ConfigSets{
@@ -25,7 +26,8 @@ func init() {
 	}
 	DefaultConfigSets.ServerHost = os.Getenv("SERVER_HOST")
 	if DefaultConfigSets.ServerHost == "" {
-		panic("NOT ENOUGH CONFIG")
+		log.Fatal("ServerHost Is Empty :( ")
+		return
 	}
 	DefaultConfigSets.ServerKey = os.Getenv("SERVER_KEY")
 	ToInt, err := strconv.ParseInt(os.Getenv("SEND_REPORT_TIME"), 10, 64)
