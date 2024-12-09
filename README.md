@@ -6,7 +6,7 @@ ProcessReporter 是一个 为 [Shiro](https://github.com/Innei/Shiro) 主题做�
 
 ## Installation
 
-See Release
+See [Release](https://github.com/MoYoez/ProcessReporterGo/releases) 
 
 ## Build
 
