@@ -4,20 +4,41 @@ package darwin
 
 /*
 #cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework AppKit -framework Foundation
-#import <Cocoa/Cocoa.h>
+#cgo LDFLAGS: -framework CoreGraphics -framework Foundation
+#import <CoreGraphics/CoreGraphics.h>
+#import <Foundation/Foundation.h>
 #import <stdlib.h>
 
-// getFrontmostAppName returns the localized name of the frontmost application.
-// Caller must free the returned pointer with C.free.
 char* getFrontmostAppName(void) {
-	NSRunningApplication *app = [[NSWorkspace sharedWorkspace] frontmostApplication];
-	if (!app) return NULL;
-	NSString *name = [app localizedName];
-	if (!name) return NULL;
-	const char *utf8 = [name UTF8String];
-	if (!utf8) return NULL;
-	return strdup(utf8);
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(
+        kCGWindowListOptionOnScreenOnly | kCGWindowListOptionOnScreenAboveWindow,
+        kCGNullWindowID
+    );
+
+    if (!windowList) return NULL;
+
+    CFIndex count = CFArrayGetCount(windowList);
+    char *result = NULL;
+
+    for (CFIndex i = 0; i < count; i++) {
+        CFDictionaryRef window = CFArrayGetValueAtIndex(windowList, i);
+        CFNumberRef layer = CFDictionaryGetValue(window, kCGWindowLayer);
+
+        int layerValue = 0;
+        if (layer && CFNumberGetValue(layer, kCFNumberIntType, &layerValue)) {
+            if (layerValue == 0) { // simple window
+                CFStringRef ownerName = CFDictionaryGetValue(window, kCGWindowOwnerName);
+                if (ownerName) {
+                    NSString *name = (__bridge NSString *)ownerName;
+                    result = strdup([name UTF8String]);
+                    break;
+                }
+            }
+        }
+    }
+
+    CFRelease(windowList);
+    return result;
 }
 */
 import "C"
@@ -27,7 +48,7 @@ import (
 )
 
 // GetForegroundApplicationName returns the name of the frontmost application on macOS.
-// It uses NSWorkspace sharedWorkspace frontmostApplication (CGO + AppKit).
+// Caller should run from main thread (e.g. main goroutine with runtime.LockOSThread) for up-to-date result.
 // Returns (name, false) on success, ("", true) on failure.
 func GetForegroundApplicationName() (string, bool) {
 	cstr := C.getFrontmostAppName()
