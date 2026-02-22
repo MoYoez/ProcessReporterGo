@@ -47,7 +47,7 @@ func RunService() {
 	case GetService == define.Linux:
 		panic("Not Support Yet.")
 	case GetService == define.MacOS:
-		panic("Not Support Yet.")
+		caller.MacOSRespPacked(&DefaultConfigSets)
 	case GetService == define.Unknown:
 		panic("This Is unknown System (Unknown Type). ")
 	}
