@@ -26,6 +26,7 @@ func MacOSRespPacked(config *types.ConfigSets) {
 			Url:         config.ServerHost,
 			ProcessName: GetCallerName,
 			Key:         config.ServerKey,
+			Debug:       config.Debug,
 		})
 	}
 }

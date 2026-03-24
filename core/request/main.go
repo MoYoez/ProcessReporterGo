@@ -17,6 +17,7 @@ type RequestStruct struct {
 	Url         string
 	ProcessName string
 	Key         string
+	Debug       bool
 }
 
 type Media struct {
@@ -41,6 +42,10 @@ func SendRequest(RequestStruct RequestStruct) {
 	ToBytes, err := json.Marshal(&PackedStructBase)
 	if err != nil {
 		panic("This situation cannot be happened.")
+	}
+	if RequestStruct.Debug {
+		log.Infof("debug mode: skip POST; url=%s body=%s", RequestStruct.Url, b2s.BytesToString(ToBytes))
+		return
 	}
 	NewRequester, err := http.NewRequest("POST", RequestStruct.Url, bytes.NewReader(ToBytes))
 	NewRequester.Header.Set("Content-Type", "application/json")

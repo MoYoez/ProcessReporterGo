@@ -15,20 +15,18 @@ func WindowsRespPacked(config *types.ConfigSets) {
 	defer Ticker.Stop()
 	// Ticket Start.
 	log.Infof("\nSetting: \nServer Endpoint: %s\nServer Key : %s\nTicket Pre Request Time: %d", config.ServerHost, config.ServerKey, config.SendReportTime)
-	for {
-		select {
-		case <-Ticker.C:
-			GetCallerName, err := win32.GetForegroundWindowApplicationName()
-			if err {
-				log.Error("Cannot read ForeGround Windows Status")
-				return
-			}
-			// transform.
-			request.SendRequest(request.RequestStruct{
-				Url:         config.ServerHost,
-				ProcessName: GetCallerName,
-				Key:         config.ServerKey,
-			})
+	for range Ticker.C {
+		GetCallerName, err := win32.GetForegroundWindowApplicationName()
+		if err {
+			log.Error("Cannot read ForeGround Windows Status")
+			return
 		}
+		// transform.
+		request.SendRequest(request.RequestStruct{
+			Url:         config.ServerHost,
+			ProcessName: GetCallerName,
+			Key:         config.ServerKey,
+			Debug:       config.Debug,
+		})
 	}
 }

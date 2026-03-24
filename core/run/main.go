@@ -8,6 +8,7 @@ import (
 	"github.com/joho/godotenv"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var DefaultConfigSets = types.ConfigSets{}
@@ -24,8 +25,11 @@ func init() {
 		ServerKey:      "",
 		SendReportTime: 30,
 	}
+	debugEnv := strings.TrimSpace(strings.ToLower(os.Getenv("DEBUG")))
+	DefaultConfigSets.Debug = debugEnv == "1" || debugEnv == "true" || debugEnv == "yes"
+
 	DefaultConfigSets.ServerHost = os.Getenv("SERVER_HOST")
-	if DefaultConfigSets.ServerHost == "" {
+	if DefaultConfigSets.ServerHost == "" && !DefaultConfigSets.Debug {
 		log.Fatal("ServerHost Is Empty :( ")
 		return
 	}
@@ -36,6 +40,10 @@ func init() {
 	}
 	// pre check data
 	DefaultConfigSets.SendReportTime = ToInt
+
+	if DefaultConfigSets.Debug {
+		log.Info("debug mode enabled: reports are printed only, no HTTP POST")
+	}
 
 }
 
