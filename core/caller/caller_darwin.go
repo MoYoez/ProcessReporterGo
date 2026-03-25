@@ -3,11 +3,12 @@
 package caller
 
 import (
+	"time"
+
 	"github.com/MoYoez/ProcessReporterGo/core/request"
 	"github.com/MoYoez/ProcessReporterGo/tools/darwin"
 	"github.com/MoYoez/ProcessReporterGo/types"
 	"github.com/charmbracelet/log"
-	"time"
 )
 
 // MacOSRespPacked runs the reporter loop on macOS: periodically gets the
@@ -15,7 +16,7 @@ import (
 func MacOSRespPacked(config *types.ConfigSets) {
 	Ticker := time.NewTicker(time.Second * (time.Duration(config.SendReportTime)))
 	defer Ticker.Stop()
-	log.Infof("\nSetting: \nServer Endpoint: %s\nServer Key : %s\nTicket Pre Request Time: %d", config.ServerHost, config.ServerKey, config.SendReportTime)
+	log.Debugf("\nSetting: \nServer Endpoint: %s\nServer Key : %s\nTicket Pre Request Time: %d", config.ServerHost, config.ServerKey, config.SendReportTime)
 	for range Ticker.C {
 		GetCallerName, err := darwin.GetForegroundApplicationName()
 		if err {

@@ -15,7 +15,6 @@ var GetWindowHeadLineText *syscall.LazyProc
 var GetWindowThreadProcessID *syscall.LazyProc
 
 var ProcessID uintptr
-var WindowTitle [256]uint16
 
 func init() {
 	ForeGroundCaller = syscall.NewLazyDLL("user32.dll").NewProc("GetForegroundWindow")
@@ -23,12 +22,12 @@ func init() {
 	GetWindowHeadLineText = syscall.NewLazyDLL("user32.dll").NewProc("GetWindowTextW")
 }
 
-func GetHWND() (HWND uintptr, errorBool bool) {
-	HWND, err, _ := ForeGroundCaller.Call()
-	if err != 0 {
-		errorBool = true
+func GetHWND() (hwnd uintptr, errorBool bool) {
+	r, _, _ := ForeGroundCaller.Call()
+	if r == 0 {
+		return 0, true
 	}
-	return HWND, errorBool
+	return r, false
 }
 
 // GetForegroundWindowID Windows Platform Only.
@@ -50,7 +49,25 @@ func GetForegroundWindowApplicationName() (CallerName string, errorBool bool) {
 	return CallerName, false
 }
 
-func GetWindowTitle(id uintptr) (string, bool) {
-	GetWindowHeadLineText.Call(id, uintptr(unsafe.Pointer(&WindowTitle)), uintptr(len(WindowTitle)))
-	return syscall.UTF16ToString(WindowTitle[:]), false
+// GetWindowTitle reads the caption text of the window identified by hwnd (not a process ID).
+func GetWindowTitle(hwnd uintptr) (string, bool) {
+	if hwnd == 0 {
+		return "", true
+	}
+	var buf [512]uint16
+	_, _, _ = GetWindowHeadLineText.Call(hwnd, uintptr(unsafe.Pointer(&buf[0])), uintptr(len(buf)))
+	return syscall.UTF16ToString(buf[:]), false
+}
+
+// GetForegroundWindowTitle returns the title bar text of the current foreground window.
+func GetForegroundWindowTitle() (title string, errorBool bool) {
+	hwnd, err := GetHWND()
+	if err {
+		return "", true
+	}
+	title, err = GetWindowTitle(hwnd)
+	if err {
+		return "", true
+	}
+	return title, false
 }

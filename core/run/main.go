@@ -1,14 +1,15 @@
 package run
 
 import (
+	"os"
+	"strconv"
+	"strings"
+
 	"github.com/MoYoez/ProcessReporterGo/core/caller"
 	"github.com/MoYoez/ProcessReporterGo/core/define"
 	"github.com/MoYoez/ProcessReporterGo/types"
 	"github.com/charmbracelet/log"
 	"github.com/joho/godotenv"
-	"os"
-	"strconv"
-	"strings"
 )
 
 var DefaultConfigSets = types.ConfigSets{}
@@ -36,7 +37,7 @@ func init() {
 	DefaultConfigSets.ServerKey = os.Getenv("SERVER_KEY")
 	ToInt, err := strconv.ParseInt(os.Getenv("SEND_REPORT_TIME"), 10, 64)
 	if err != nil {
-		ToInt = 30
+		ToInt = 5
 	}
 	// pre check data
 	DefaultConfigSets.SendReportTime = ToInt

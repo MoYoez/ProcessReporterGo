@@ -16,6 +16,7 @@ var RequestHttpClient http.Client
 type RequestStruct struct {
 	Url         string
 	ProcessName string
+	Title       string // Foreground window title (e.g. Windows); optional on other platforms.
 	Key         string
 	Debug       bool
 }
@@ -28,6 +29,7 @@ type Media struct {
 type PackedStruct struct {
 	Timestamp int64  `json:"timestamp"`
 	Process   string `json:"process"`
+	Title     string `json:"title,omitempty"`
 	Key       string `json:"key"`
 }
 
@@ -37,6 +39,7 @@ func SendRequest(RequestStruct RequestStruct) {
 	PackedStructBase := PackedStruct{
 		Timestamp: time.Now().Unix(),
 		Process:   ProcessReplacer(RequestStruct.ProcessName),
+		Title:     RequestStruct.Title,
 		Key:       RequestStruct.Key,
 	}
 	ToBytes, err := json.Marshal(&PackedStructBase)
